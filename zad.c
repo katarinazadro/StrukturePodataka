@@ -12,7 +12,7 @@ typedef struct{
     int bodovi;
 }student;
 
-int count_rows(char* filename);
+int count_rows(char* filename);   //broji broj redova 
 student* read_students(char* filename, int broj_studenata);
 void print_students(student* studenti, int broj_studenata);
 
@@ -22,8 +22,8 @@ int main(int argc, char* argv[]){
         printf("Unijeti ./%s filename\n", argv[0]);
         return ERROR_OF;
     }
-    char* filename = argv[1];
-    int broj_studenata = count_rows(filename);
+    char* filename = argv[1]; //naziv datoteke koju korisnik otvara
+    int broj_studenata = count_rows(filename);//brojanje studenata u datoteci
 
     if(broj_studenata == ERROR_OF){
         return ERROR_OF;
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
         return ERROR_OF;
     }
 
-    print_students(studenti, broj_studenata);
+    print_students(studenti, broj_studenata);//ispisivanje podataka
 
     free(studenti);
 
@@ -50,12 +50,12 @@ int count_rows(char* filename){
         return ERROR_OF;
     }
 
-    char buffer[BUFFER_SIZE] = {0};
-    int count=0;
+    char buffer[BUFFER_SIZE] = {0}; //deklaracija niza buffer , inicijalizacija na nulu
+    int count=0;//brojac redova 
 
 
     while(fgets(buffer, BUFFER_SIZE, fp) != NULL){
-        count++;
+        count++;// inkrementiranje brojaca
     }
 
     fclose(fp);
