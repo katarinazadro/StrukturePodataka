@@ -118,11 +118,12 @@ position delete(position head, position wanted){
     }
 
     position previous = find_previous(head, wanted);
-    if(previous == NULL){
-        head->next = wanted->next;
+    if(previous != NULL){
+        previous->next = wanted->next;
 
         free(wanted);
     }
+    return head;
 
 
 }
@@ -130,7 +131,7 @@ position delete(position head, position wanted){
 position find_previous(position head, position wanted){
     position temp = head;
 
-    while(temp->next!=NULL){
+    while(temp !=NULL){
         if(temp->next == wanted){
             return temp;
         }
@@ -140,3 +141,4 @@ position find_previous(position head, position wanted){
 
     return NULL;
 }
+
