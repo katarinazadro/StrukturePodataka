@@ -127,7 +127,7 @@ int append_list(position head, char* fname, char* lname, int* year){
         return NULL;
     }
 
-int insert_before(position* head, position target, char* fname, char* lname, int* year){
+int insert_before(position* head, position target, char* fname, char* lname, int* year){ //ili naci prethodnika i isto kao pod a) find_previous + insert_after
     //koristimo *head kako bi ga mogli mijenjati u funkciji
     if(*head == NULL|| target == NULL){
         printf("Lista je prazna.\n");
@@ -168,38 +168,6 @@ if(*head == target){
     return 0;
 }
 
-void sort_by_lname(position *head){
-    if(*head == NULL || (*head)->next == NULL){ //provjera je li lista prazna ili ima samo jedan cvor
-        
-    }
-    position j;//prolaz kroz listu
-    position prev; // zadrzavanje prethodnog cvora,
-    position temp;//pomovni pokazivac za zamjenu
-    position end = NULL; //kraj sortiranog dijela
-
-    while((*head)->next !=end){
-        //prolazimo kroz cijelu listu dok ne dodjemo do kraja
-        prev = *head; //postavljamo prev na pocetak
-        j = (*head)->next; // prvi element nakon head-a
-        while(j != end){ //prolazi kroz listu dok j ne dodje do end
-            if(strcmp(j->lname,j->next->lname) > 0){ //usporedjujemo  cvorove
-                temp = j->next;// temp se postavlja na cvor koji dolazi iza j
-                prev->next = temp; //povezujemo pretodni cvor  sa novim zamijenjenim cvorom temp, uspostavlja se veza izmedju prethodnog cvora i novog glavnog
-                j->next = temp->next;//povezujemo j sa cvorom koji dolazi poslije temp
-                temp->next = j; //postavljamo temp tako da pokazuje na j, gotova zamjena, temp je sada ispred j u listi
-               
-                prev = temp; // prev se azurira na temp kako bi nastavili od pozicije gdje je temp sada, prati posljednji zamijenjeni kod
-               
-            }else{
-                prev = j; // ako nije potrebno mijenjati samo azuriramo prev
-                
-           
-        }
-        j = j->next; //prelazimo na sljedeci cvor
-        }
-        end = j; //end je na kraju trenutnog nesortiranog dijela, sprjecava da se provjerava dio koji je vec sortiran, azuriramo end na zadnji cvor koji je sortiran
-    }
-}
 
 void print_in_file(position first){
     FILE *fp = NULL;
@@ -220,6 +188,7 @@ void print_in_file(position first){
 }
 
 void read_file(position* head, FILE* fp){
+    fp = fopen("lista.txt", "r");
     if(fp == NULL){
         printf("Datoteka se ne moze otvoriti.\n");
         return;
@@ -249,4 +218,9 @@ void read_file(position* head, FILE* fp){
         last = q;
     }
     fclose(fp);
+}
+
+void insert_after(position head,char* fname, char* lname, int year){
+    position new_person = NULL;
+    new_person = create_person(fname,lname,year);
 }

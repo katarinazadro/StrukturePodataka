@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct person* position;
+typedef struct person* position; //pokazivac na strukturu
 
 typedef struct person{
     char fname[32];
@@ -14,13 +14,13 @@ typedef struct person{
 int main(){
 
 
-person head = {.fname = "", .lname = "", .birth_year = 0, .next = NULL};    // prazna lista
+person head = {.fname = "", .lname = "", .birth_year = 0, .next = NULL};    // prazna lista, head uvijek stavimo da je staticki alociran(preko strukture), a sve ostalo neka bude dinamicki alocirano
     return 0;
 
 }
 
 // funkcija za izradu osobe
-position create_person(char* fname, char* lname, int* year){
+position create_person(char* fname, char* lname, int year){
     position new_person = NULL;
  new_person = (position)malloc(sizeof(person)); //alokacija potrebne memorije za novu osobu
  if(new_person == NULL){
@@ -29,25 +29,25 @@ position create_person(char* fname, char* lname, int* year){
  }
  strcpy(new_person->fname,fname);
  strcpy(new_person->lname,lname);
- new_person->birth_year = *year; 
+ new_person->birth_year = year; 
  new_person->next = NULL;
 
  return new_person;
 }
 
-int prepend_list(position head, char* fname, char* lname, int *year){
+int prepend_list(position head, char* fname, char* lname, int year){
 
     position new_person = create_person(fname,lname,year);
     if(new_person == NULL){
         printf("Greska.\n");
         return -1;
     }
-    insert_after(head, new_person);
+    insert_after(head, new_person); // umetanje iza
     return 0;
 
 }
 
-void insert_after(position prev, position new){
+void insert_after(position prev, position new){ //saljemo position zato sto saljem pokazivace
 
     if(prev != NULL && new != NULL){
         new->next = prev->next;
@@ -67,7 +67,7 @@ int print_list(position first){
     return 0;
 }
 
-int append_list(position head, char* fname, char* lname, int* year){
+int append_list(position head, char* fname, char* lname, int year){
     position new_person = create_person(fname,lname,year);
     if(new_person == NULL){
         printf("Greska.\n");
