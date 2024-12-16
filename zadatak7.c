@@ -4,12 +4,13 @@
 
 #define MAX_NAZIV 100
 
+// Definicija strukture za direktorij (dvostruko vezana lista)
 typedef struct Direktorij* direktorij;
 typedef struct Direktorij {
-    char naziv[MAX_NAZIV];           // Naziv direktorija
-    direktorij lijevo;               // Lijevo podstablo (manji naziv)
-    direktorij desno;                // Desno podstablo (veci naziv)
-    direktorij roditelj;             // Pokazivac na roditeljski direktorij
+    char naziv[MAX_NAZIV];   
+    direktorij sljedeci;     
+    direktorij prethodni;    
+    direktorij roditelj;     
 } Direktorij;
 
 // Funkcija za kreiranje novog direktorija
@@ -21,67 +22,51 @@ direktorij kreirajDirektorij(const char* naziv, direktorij roditelj) {
     }
 
     strcpy(novi->naziv, naziv);
-    novi->lijevo = NULL;
-    novi->desno = NULL;
+    novi->sljedeci = NULL;
+    novi->prethodni = NULL;
     novi->roditelj = roditelj;
 
     return novi;
 }
 
-// Funkcija za dodavanje pod-direktorija u stablo
+// Funkcija za dodavanje pod-direktorija u listu
 void dodajPodDirektorij(direktorij trenutni, const char* naziv) {
     direktorij novi = kreirajDirektorij(naziv, trenutni);
 
-    direktorij temp = trenutni;
-    direktorij prethodni = NULL;
-
-    while (temp != NULL) {
-        prethodni = temp;
-        if (strcmp(novi->naziv, temp->naziv) < 0) {
-            temp = temp->lijevo;
-        } else {
-            temp = temp->desno;
+    // Ako trenutni direktorij nije NULL, dodaj novi direktorij na kraj liste
+    if (trenutni != NULL) {
+        direktorij temp = trenutni;
+        while (temp->sljedeci != NULL) {
+            temp = temp->sljedeci;  // Prelazimo do kraja liste
         }
-    }
-
-
-    if (strcmp(novi->naziv, prethodni->naziv) < 0) {
-        prethodni->lijevo = novi;
+        temp->sljedeci = novi;   // Dodajemo novi direktorij na kraj
+        novi->prethodni = temp;  // Postavljamo prethodni direktorij
     } else {
-        prethodni->desno = novi;
+        trenutni = novi;  // Ako je lista prazna, novi postaje prvi direktorij
     }
 }
 
-// Funkcija za pretragu pod-direktorija u stablu
+// Funkcija za pretragu pod-direktorija u listi
 direktorij pronadjiPodDirektorij(direktorij trenutni, const char* naziv) {
-    direktorij temp = trenutni;
-
+    direktorij temp = trenutni->sljedeci;  
     while (temp != NULL) {
         if (strcmp(temp->naziv, naziv) == 0) {
-            return temp;
+            return temp;  
         }
-        if (strcmp(naziv, temp->naziv) < 0) {
-            temp = temp->lijevo;
-        } else {
-            temp = temp->desno;
-        }
+        temp = temp->sljedeci;  // Nastavljamo dalje kroz listu
     }
-
-    return NULL;  // Ako nije pronadjen direktorij
+    return NULL; 
 }
 
-// Funkcija za ispis pod-direktorija u trenutnom direktoriju
+// Funkcija za ispis poddirektorija
 void ispisDirektorija(direktorij trenutni) {
-    if (trenutni == NULL) return;
-
-    // Ispis samo trenutnih pod-direktorija
-    if (trenutni->lijevo != NULL) {
-        printf("%s\n", trenutni->lijevo->naziv);
-        ispisDirektorija(trenutni->lijevo);
+    direktorij temp = trenutni->sljedeci;  
+    if (temp == NULL) {
+        printf("Direktorij je prazan.\n");
     }
-    if (trenutni->desno != NULL) {
-        printf("%s\n", trenutni->desno->naziv);
-        ispisDirektorija(trenutni->desno);
+    while (temp != NULL) {
+        printf("%s\n", temp->naziv);  // Ispisujemo naziv poddirektorija
+        temp = temp->sljedeci;  
     }
 }
 
@@ -93,6 +78,7 @@ direktorij cdUp(direktorij trenutni) {
     return trenutni;  // Ako nema roditelja, ostaje u trenutnom direktoriju
 }
 
+
 void unosKomande(direktorij* trenutni) {
     int izbor;
     char naziv[MAX_NAZIV];
@@ -100,11 +86,11 @@ void unosKomande(direktorij* trenutni) {
     while (1) {
         // Prikazivanje menija
         printf("\nMeni:\n");
-        printf("1. md [naziv]\n");
-        printf("2. cd [naziv]\n");
-        printf("3. cd..\n");
-        printf("4. dir\n");
-        printf("5. Izlaz\n");
+        printf("1. md [naziv] - Kreira novi direktorij\n");
+        printf("2. cd [naziv] - Ulazi u pod-direktorij\n");
+        printf("3. cd.. - Povratak u roditeljski direktorij\n");
+        printf("4. dir - Ispis sadržaja direktorija\n");
+        printf("5. Izlaz - Završava program\n");
         printf("Unesite izbor: ");
         scanf("%d", &izbor);
 
@@ -113,10 +99,10 @@ void unosKomande(direktorij* trenutni) {
                 printf("Unesite naziv direktorija: ");
                 scanf("%s", naziv);
 
-                // Provjeriti ako direktorij vec postoji
+                // Provjeriti ako direktorij c postoji
                 if (pronadjiPodDirektorij(*trenutni, naziv) != NULL) {
                     printf("Direktorij '%s' vec postoji.\n", naziv);
-                    return;
+                    break;
                 }
 
                 // Dodaj pod-direktorij u trenutni direktorij
@@ -144,7 +130,7 @@ void unosKomande(direktorij* trenutni) {
                 break;
 
             case 4:  // Ispis pod-direktorija
-                printf("Ispis sadržaja direktorija '%s':\n", (*trenutni)->naziv);
+                printf("Ispis sadrzaja direktorija '%s':\n", (*trenutni)->naziv);
                 ispisDirektorija(*trenutni);
                 break;
 
@@ -160,10 +146,10 @@ void unosKomande(direktorij* trenutni) {
 
 int main() {
     // Kreiranje root direktorija
-    direktorij root = (direktorij)malloc(sizeof(Direktorij)); 
+    direktorij root = (direktorij)malloc(sizeof(Direktorij));
     strcpy(root->naziv, "root");  
-    root->lijevo = NULL; 
-    root->desno = NULL;
+    root->sljedeci = NULL; 
+    root->prethodni = NULL;
     root->roditelj = NULL;
 
     direktorij trenutni = root;  // Trenutni direktorij je root
@@ -171,7 +157,7 @@ int main() {
     
     unosKomande(&trenutni);
 
-    // Oslobadanje memoriju
-    free(root);  
+
+    free(root);
     return 0;
 }
