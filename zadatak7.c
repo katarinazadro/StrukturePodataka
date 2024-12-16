@@ -3,17 +3,16 @@
 #include <string.h>
 
 #define MAX_NAZIV 100
+#define BUFFER_SIZE 1024
 
-// Definicija strukture za direktorij (dvostruko vezana lista)
 typedef struct Direktorij* direktorij;
 typedef struct Direktorij {
-    char naziv[MAX_NAZIV];   
-    direktorij sljedeci;     
-    direktorij prethodni;    
-    direktorij roditelj;     
+    char naziv[MAX_NAZIV]; 
+    direktorij sljedeci;
+    direktorij prethodni;
+    direktorij roditelj;
 } Direktorij;
 
-// Funkcija za kreiranje novog direktorija
 direktorij kreirajDirektorij(const char* naziv, direktorij roditelj) {
     direktorij novi = (direktorij)malloc(sizeof(Direktorij));
     if (novi == NULL) {
@@ -29,135 +28,151 @@ direktorij kreirajDirektorij(const char* naziv, direktorij roditelj) {
     return novi;
 }
 
-// Funkcija za dodavanje pod-direktorija u listu
 void dodajPodDirektorij(direktorij trenutni, const char* naziv) {
     direktorij novi = kreirajDirektorij(naziv, trenutni);
 
-    // Ako trenutni direktorij nije NULL, dodaj novi direktorij na kraj liste
     if (trenutni != NULL) {
         direktorij temp = trenutni;
         while (temp->sljedeci != NULL) {
-            temp = temp->sljedeci;  // Prelazimo do kraja liste
+            temp = temp->sljedeci;
         }
-        temp->sljedeci = novi;   // Dodajemo novi direktorij na kraj
-        novi->prethodni = temp;  // Postavljamo prethodni direktorij
+        temp->sljedeci = novi;
+        novi->prethodni = temp;
     } else {
-        trenutni = novi;  // Ako je lista prazna, novi postaje prvi direktorij
+        trenutni = novi;
     }
 }
 
-// Funkcija za pretragu pod-direktorija u listi
 direktorij pronadjiPodDirektorij(direktorij trenutni, const char* naziv) {
-    direktorij temp = trenutni->sljedeci;  
+    direktorij temp = trenutni->sljedeci;
+
     while (temp != NULL) {
         if (strcmp(temp->naziv, naziv) == 0) {
-            return temp;  
+            return temp;
         }
-        temp = temp->sljedeci;  // Nastavljamo dalje kroz listu
+        temp = temp->sljedeci;
     }
-    return NULL; 
+
+    return NULL;
 }
 
-// Funkcija za ispis poddirektorija
 void ispisDirektorija(direktorij trenutni) {
-    direktorij temp = trenutni->sljedeci;  
-    if (temp == NULL) {
-        printf("Direktorij je prazan.\n");
-    }
+    direktorij temp = trenutni->sljedeci;
+    if (temp == NULL) return;
+
     while (temp != NULL) {
-        printf("%s\n", temp->naziv);  // Ispisujemo naziv poddirektorija
-        temp = temp->sljedeci;  
+        printf("%s\n", temp->naziv);
+        temp = temp->sljedeci;
     }
 }
 
-// Funkcija za povratak u roditeljski direktorij
 direktorij cdUp(direktorij trenutni) {
     if (trenutni->roditelj != NULL) {
-        return trenutni->roditelj;  
+        return trenutni->roditelj;
     }
-    return trenutni;  // Ako nema roditelja, ostaje u trenutnom direktoriju
+    return trenutni;
 }
 
+void oslobodiDirektorij(direktorij trenutni) {
+    if (trenutni == NULL) return;
+
+    direktorij temp = trenutni->sljedeci;
+    while (temp != NULL) {
+        direktorij to_delete = temp;
+        temp = temp->sljedeci;
+        free(to_delete);  
+    }
+    free(trenutni);  
+}
 
 void unosKomande(direktorij* trenutni) {
     int izbor;
     char naziv[MAX_NAZIV];
+    char komanda[MAX_NAZIV];
+    char buffer[BUFFER_SIZE];
 
     while (1) {
-        // Prikazivanje menija
         printf("\nMeni:\n");
-        printf("1. md [naziv] - Kreira novi direktorij\n");
-        printf("2. cd [naziv] - Ulazi u pod-direktorij\n");
-        printf("3. cd.. - Povratak u roditeljski direktorij\n");
-        printf("4. dir - Ispis sadržaja direktorija\n");
-        printf("5. Izlaz - Završava program\n");
-        printf("Unesite izbor: ");
-        scanf("%d", &izbor);
+        printf("- md [naziv]\n");
+        printf("- cd [naziv]\n");
+        printf("- cd..\n");
+        printf("- dir\n");
+        printf("- Izlaz\n");
+        printf("\nTrenutni direktorij: %s\n", (*trenutni)->naziv);
+        printf("\nUnesite komandu: ");
 
-        switch (izbor) {
-            case 1:  // Kreiranje novog direktorija
-                printf("Unesite naziv direktorija: ");
-                scanf("%s", naziv);
+        if (fgets(buffer, MAX_NAZIV, stdin) == NULL) {
+            printf("Greska prilikom citanja komande!\n");
+            continue;
+        }
+        buffer[strcspn(buffer, "\n")] = 0;
 
-                // Provjeriti ako direktorij c postoji
-                if (pronadjiPodDirektorij(*trenutni, naziv) != NULL) {
-                    printf("Direktorij '%s' vec postoji.\n", naziv);
-                    break;
-                }
+        int argumenti = sscanf(buffer, "%s %s", komanda, naziv);
+        if (argumenti == -1) continue;
 
-                // Dodaj pod-direktorij u trenutni direktorij
-                dodajPodDirektorij(*trenutni, naziv);
-                printf("Direktorij '%s' uspjesno kreiran.\n", naziv);
-                break;
+        if (strcmp(komanda, "md") == 0) {
+            if (argumenti < 2) {
+                printf("\nNedostaje naziv za 'md'.\n");
+                continue;
+            }
 
-            case 2:  // Ulazak u pod-direktorij
-                printf("Unesite naziv pod-direktorija: ");
-                scanf("%s", naziv);
+            if (pronadjiPodDirektorij(*trenutni, naziv) != NULL) {
+                printf("\nDirektorij '%s' vec postoji.\n", naziv);
+                continue;
+            }
 
-                // Pronalazenje pod-direktorija
-                direktorij podDirektorij = pronadjiPodDirektorij(*trenutni, naziv);
-                if (podDirektorij != NULL) {
-                    *trenutni = podDirektorij;  // Ulazak u pod-direktorij
-                    printf("Usli ste u direktorij '%s'.\n", naziv);
-                } else {
-                    printf("Pod-direktorij '%s' ne postoji.\n", naziv);
-                }
-                break;
+            dodajPodDirektorij(*trenutni, naziv);
+            printf("\nDirektorij '%s' uspjesno kreiran.\n", naziv);
 
-            case 3:  // Povratak u roditeljski direktorij
-                *trenutni = cdUp(*trenutni);
-                printf("Vratili ste se u roditeljski direktorij.\n");
-                break;
+        }
+        else if (strcmp(komanda, "cd") == 0) {
+            if (argumenti < 2) {
+                printf("\nNedostaje naziv za 'cd'.\n");
+                continue;
+            }
 
-            case 4:  // Ispis pod-direktorija
-                printf("Ispis sadrzaja direktorija '%s':\n", (*trenutni)->naziv);
-                ispisDirektorija(*trenutni);
-                break;
+            direktorij podDirektorij = pronadjiPodDirektorij(*trenutni, naziv);
+            if (podDirektorij != NULL) {
+                *trenutni = podDirektorij;
+                printf("\nUsli ste u direktorij '%s'.\n", naziv);
+            } else {
+                printf("\nPod-direktorij '%s' ne postoji.\n", naziv);
+            }
 
-            case 5:  // Izlaz iz programa
-                printf("Izlaz iz programa.\n");
-                return;
+        }
+        else if (strcmp(komanda, "cd..") == 0) {
+            *trenutni = cdUp(*trenutni);
+            printf("\nVratili ste se u roditeljski direktorij.\n");
 
-            default:
-                printf("Nepoznata komanda!\n");
+        }
+        else if (strcmp(komanda, "dir") == 0) {
+            printf("\nSadrzaj direktorija '%s':\n", (*trenutni)->naziv);
+            ispisDirektorija(*trenutni);
+
+        }
+        else if (strcmp(komanda, "izlaz") == 0 || strcmp(buffer, "izlaz") == 0) {
+            printf("\nIzlaz iz programa.\n");
+            break;
+        }
+        else {
+            printf("\nNepoznata komanda: '%s'\n", komanda);
         }
     }
 }
 
 int main() {
-    // Kreiranje root direktorija
     direktorij root = (direktorij)malloc(sizeof(Direktorij));
-    strcpy(root->naziv, "root");  
+    strcpy(root->naziv, "root");
     root->sljedeci = NULL; 
     root->prethodni = NULL;
     root->roditelj = NULL;
 
-    direktorij trenutni = root;  // Trenutni direktorij je root
+    direktorij trenutni = root;
 
-    
     unosKomande(&trenutni);
 
-
-    free(root);
+    // Oslobadjanje memorije samo za root direktorij
+    oslobodiDirektorij(root);
     return 0;
 }
+
