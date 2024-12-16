@@ -8,8 +8,8 @@ typedef struct Direktorij* direktorij;
 typedef struct Direktorij {
     char naziv[MAX_NAZIV];           // Naziv direktorija
     direktorij lijevo;               // Lijevo podstablo (manji naziv)
-    direktorij desno;                // Desno podstablo (veći naziv)
-    direktorij roditelj;             // Pokazivač na roditeljski direktorij
+    direktorij desno;                // Desno podstablo (veci naziv)
+    direktorij roditelj;             // Pokazivac na roditeljski direktorij
 } Direktorij;
 
 // Funkcija za kreiranje novog direktorija
@@ -28,7 +28,7 @@ direktorij kreirajDirektorij(const char* naziv, direktorij roditelj) {
     return novi;
 }
 
-// Funkcija za dodavanje pod-direktorija u stablo (BST)
+// Funkcija za dodavanje pod-direktorija u stablo
 void dodajPodDirektorij(direktorij trenutni, const char* naziv) {
     direktorij novi = kreirajDirektorij(naziv, trenutni);
 
@@ -44,7 +44,7 @@ void dodajPodDirektorij(direktorij trenutni, const char* naziv) {
         }
     }
 
-    // Dodajemo novi čvor
+
     if (strcmp(novi->naziv, prethodni->naziv) < 0) {
         prethodni->lijevo = novi;
     } else {
@@ -67,7 +67,7 @@ direktorij pronadjiPodDirektorij(direktorij trenutni, const char* naziv) {
         }
     }
 
-    return NULL;  // Ako nije pronađen direktorij
+    return NULL;  // Ako nije pronadjen direktorij
 }
 
 // Funkcija za ispis pod-direktorija u trenutnom direktoriju
@@ -88,7 +88,7 @@ void ispisDirektorija(direktorij trenutni) {
 // Funkcija za povratak u roditeljski direktorij
 direktorij cdUp(direktorij trenutni) {
     if (trenutni->roditelj != NULL) {
-        return trenutni->roditelj;  // Vraća korisnika u roditeljski direktorij
+        return trenutni->roditelj;  
     }
     return trenutni;  // Ako nema roditelja, ostaje u trenutnom direktoriju
 }
@@ -113,26 +113,26 @@ void unosKomande(direktorij* trenutni) {
                 printf("Unesite naziv direktorija: ");
                 scanf("%s", naziv);
 
-                // Provjeriti ako direktorij već postoji
+                // Provjeriti ako direktorij vec postoji
                 if (pronadjiPodDirektorij(*trenutni, naziv) != NULL) {
-                    printf("Direktorij '%s' već postoji.\n", naziv);
+                    printf("Direktorij '%s' vec postoji.\n", naziv);
                     return;
                 }
 
                 // Dodaj pod-direktorij u trenutni direktorij
                 dodajPodDirektorij(*trenutni, naziv);
-                printf("Direktorij '%s' uspješno kreiran.\n", naziv);
+                printf("Direktorij '%s' uspjesno kreiran.\n", naziv);
                 break;
 
             case 2:  // Ulazak u pod-direktorij
                 printf("Unesite naziv pod-direktorija: ");
                 scanf("%s", naziv);
 
-                // Pronalaženje pod-direktorija
+                // Pronalazenje pod-direktorija
                 direktorij podDirektorij = pronadjiPodDirektorij(*trenutni, naziv);
                 if (podDirektorij != NULL) {
                     *trenutni = podDirektorij;  // Ulazak u pod-direktorij
-                    printf("Ušli ste u direktorij '%s'.\n", naziv);
+                    printf("Usli ste u direktorij '%s'.\n", naziv);
                 } else {
                     printf("Pod-direktorij '%s' ne postoji.\n", naziv);
                 }
@@ -160,18 +160,18 @@ void unosKomande(direktorij* trenutni) {
 
 int main() {
     // Kreiranje root direktorija
-    direktorij root = (direktorij)malloc(sizeof(Direktorij));  // Koristite malloc za alokaciju root direktorija
-    strcpy(root->naziv, "root");  // Postavite naziv root direktorija
+    direktorij root = (direktorij)malloc(sizeof(Direktorij)); 
+    strcpy(root->naziv, "root");  
     root->lijevo = NULL; 
     root->desno = NULL;
     root->roditelj = NULL;
 
     direktorij trenutni = root;  // Trenutni direktorij je root
 
-    // Pokrenite unos komandi
+    
     unosKomande(&trenutni);
 
-    // Oslobodite memoriju
-    free(root);  // Ovdje bi trebalo implementirati funkciju koja oslobađa sve direktorije
+    // Oslobadanje memoriju
+    free(root);  
     return 0;
 }
