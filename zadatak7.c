@@ -108,7 +108,7 @@ void unosKomande(direktorij* trenutni) {
         buffer[strcspn(buffer, "\n")] = 0;
 
         int argumenti = sscanf(buffer, "%s %s", komanda, naziv);
-        if (argumenti == -1) continue;
+        if (argumenti == 0) continue;
 
         if (strcmp(komanda, "md") == 0) {
             if (argumenti < 2) {
@@ -166,6 +166,7 @@ int main() {
     root->sljedeci = NULL; 
     root->prethodni = NULL;
     root->roditelj = NULL;
+   
 
     direktorij trenutni = root;
 
@@ -175,4 +176,4 @@ int main() {
     oslobodiDirektorij(root);
     return 0;
 }
-
+ 
