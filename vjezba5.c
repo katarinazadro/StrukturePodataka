@@ -18,7 +18,7 @@ void read_file(char* filename, position head);
 int main(){
     Postfix head = { .broj = 0, .next = NULL};
 
-    read_file("postfix.txt", &head);
+    read_file("polinomi.txt", &head);
 
     return 0;
 }
@@ -56,7 +56,7 @@ double pop(position head) {
 
 void read_file(char* filename, position head){
     FILE* fp = NULL;
-    fp = fopen(filename, "r");
+    fp = fopen("polinomi.txt", "r");
     if(!fp){
         printf("datoteka se ne moze otvoriti\n");
         return;

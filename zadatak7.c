@@ -131,6 +131,8 @@ void unosKomande(direktorij* trenutni) {
                 continue;
             }
 
+            
+
             direktorij podDirektorij = pronadjiPodDirektorij(*trenutni, naziv);
             if (podDirektorij != NULL) {
                 *trenutni = podDirektorij;
