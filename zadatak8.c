@@ -6,14 +6,12 @@
 
 typedef struct Node* position;
 
-// Definicija strukture Node
 typedef struct Node {
     int broj;
     position left;  
     position right; 
 } Node;
 
-// Funkcija za kreiranje novog čvora
 position create_element(int n_broj) {
     position new_element = (position)malloc(sizeof(Node));
     if (new_element == NULL) {
@@ -58,26 +56,34 @@ int postorder(position root){
 void levelOrder(position root) {
     if (root == NULL) return;
 
-    position queue[100]; // Jednostavan niz za red
+    position queue[100];  // Red za čuvanje čvorova
     int front = 0, rear = 0;
+    int level = 1;  // Počinjemo od nivoa 1
 
     // Dodajemo korijen u red
     queue[rear++] = root;
 
     while (front < rear) {
-        position node = queue[front++];  // Uzimamo prvi element iz reda
-        printf("%d ", node->broj);  // Ispisujemo njegovu vrijednost
-        
-        // Dodajemo njegovu djecu u red
-        if (node->left != NULL) {
-            queue[rear++] = node->left;
+        int nodesAtCurrentLevel = rear - front;  // Broj čvorova na trenutnom nivou
+        printf("Na %d. levelu su: ", level);
+
+        // Ispisujemo sve čvorove na trenutnom nivou
+        for (int i = 0; i < nodesAtCurrentLevel; i++) {
+            position node = queue[front++];  // Uzimamo prvi element iz reda
+            printf("%d ", node->broj);  // Ispisujemo broj čvora
+
+            // Dodajemo djecu trenutnog čvora u red
+            if (node->left != NULL) {
+                queue[rear++] = node->left;
+            }
+            if (node->right != NULL) {
+                queue[rear++] = node->right;
+            }
         }
-        if (node->right != NULL) {
-            queue[rear++] = node->right;
-        }
+        printf("\n");
+        level++;  // Povećavamo nivo
     }
 }
-
 position insert(position root, int value){
     if(root == NULL) return create_element(value);
     if(value < root->broj){
@@ -98,7 +104,7 @@ position search(position root, int value){
         return search(root->left, value);
     }
    else {
-        return search(root->right, value); // Tražimo u desnom podstablu
+        return search(root->right, value);
     }
 
     return NULL;
@@ -191,9 +197,9 @@ int main() {
     printf("Stablo nakon brisanja čvora sa vrijednocu %d:\n", value_to_delete);
     
    
-    printf("In-order ispis nakon brisanja: ");
+   printf("In-order ispis nakon brisanja: ");
     inorder(root);
     printf("\n");
     
-    return EXIT_SUCCESS;
+    return EXIT_SUCCESS; 
 }
